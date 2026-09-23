@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\StaffOrderController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\StaffController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionController;
-
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffOrderController;
+use Illuminate\Support\Facades\Route;
 
 
 // Dashboard
@@ -111,6 +110,11 @@ Route::middleware('auth')->group(function () {
         '/admin/inventory/monitor',
         [InventoryController::class, 'monitor']
     )->name('admin.inventory.monitor');
+
+    Route::get(
+        '/admin/inventory/view',
+        [InventoryController::class, 'view']
+    )->name('admin.inventory.view');
 });
 
 

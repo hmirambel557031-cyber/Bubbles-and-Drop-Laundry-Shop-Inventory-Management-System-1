@@ -91,16 +91,35 @@
                     Category
                 </label>
 
-                <input
-                    type="text"
+                <select
                     name="category"
-                    value="{{ old(
-                        'category',
-                        $inventoryItem->category
-                    ) }}"
                     required
                     class="w-full rounded-lg border-gray-300"
                 >
+                    @foreach ([
+                        'Detergent',
+                        'Laundry Powder',
+                        'Fabric Conditioner',
+                        'Bleach',
+                        'Stain Remover',
+                        'Laundry Soap',
+                        'Other'
+                    ] as $category)
+
+                        <option
+                            value="{{ $category }}"
+                            @selected(
+                                old(
+                                    'category',
+                                    $inventoryItem->category
+                                ) === $category
+                            )
+                        >
+                            {{ $category }}
+                        </option>
+
+                    @endforeach
+                </select>
 
             </div>
 
@@ -119,7 +138,8 @@
                         $inventoryItem->quantity
                     ) }}"
                     min="0"
-                    step="0.01"
+                    max="{{ $inventoryItem->max_capacity }}"
+                    step="1"
                     required
                     class="w-full rounded-lg border-gray-300"
                 >
@@ -131,18 +151,27 @@
                     Maximum Capacity
                 </label>
 
-                <input
-                    type="number"
+                <select
                     name="max_capacity"
-                    value="{{ old(
-                        'max_capacity',
-                        $inventoryItem->max_capacity
-                    ) }}"
-                    min="0.01"
-                    step="0.01"
                     required
                     class="w-full rounded-lg border-gray-300"
                 >
+                    @for ($i = 10; $i <= 200; $i += 10)
+
+                        <option
+                            value="{{ $i }}"
+                            @selected(
+                                old(
+                                    'max_capacity',
+                                    $inventoryItem->max_capacity
+                                ) == $i
+                            )
+                        >
+                            {{ $i }}
+                        </option>
+
+                    @endfor
+                </select>
             </div>
 
 
@@ -152,18 +181,27 @@
                     Reorder Level
                 </label>
 
-                <input
-                    type="number"
+                <select
                     name="reorder_level"
-                    value="{{ old(
-                        'reorder_level',
-                        $inventoryItem->reorder_level
-                    ) }}"
-                    min="0"
-                    step="0.01"
                     required
                     class="w-full rounded-lg border-gray-300"
                 >
+                    @for ($i = 10; $i <= 200; $i += 10)
+
+                        <option
+                            value="{{ $i }}"
+                            @selected(
+                                old(
+                                    'reorder_level',
+                                    $inventoryItem->reorder_level
+                                ) == $i
+                            )
+                        >
+                            {{ $i }}
+                        </option>
+
+                    @endfor
+                </select>
 
             </div>
 
@@ -174,16 +212,34 @@
                     Unit
                 </label>
 
-                <input
-                    type="text"
+                <select
                     name="unit"
-                    value="{{ old(
-                        'unit',
-                        $inventoryItem->unit
-                    ) }}"
                     required
                     class="w-full rounded-lg border-gray-300"
                 >
+                    @foreach ([
+                        'Piece',
+                        'Kilogram (kg)',
+                        'Liter (L)',
+                        'Bottle',
+                        'Pack',
+                        'Box'
+                    ] as $unit)
+
+                        <option
+                            value="{{ $unit }}"
+                            @selected(
+                                old(
+                                    'unit',
+                                    $inventoryItem->unit
+                                ) === $unit
+                            )
+                        >
+                            {{ $unit }}
+                        </option>
+
+                    @endforeach
+                </select>
 
             </div>
 

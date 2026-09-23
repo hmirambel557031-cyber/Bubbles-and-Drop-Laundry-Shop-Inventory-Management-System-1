@@ -15,7 +15,6 @@ class InventoryController extends Controller
 
         $query = InventoryItem::query();
 
-        // Search by item name
         if ($request->filled('search')) {
             $query->where(
                 'item_name',
@@ -24,7 +23,6 @@ class InventoryController extends Controller
             );
         }
 
-        // Filter by category
         if ($request->filled('category')) {
             $query->where(
                 'category',
@@ -42,10 +40,10 @@ class InventoryController extends Controller
             ->orderBy('category')
             ->pluck('category');
 
-        return view('admin.inventory.index', compact(
-            'items',
-            'categories'
-        ));
+        return view(
+            'admin.inventory.index',
+            compact('items', 'categories')
+        );
     }
 
     public function store(Request $request)
@@ -55,19 +53,53 @@ class InventoryController extends Controller
         }
 
         $validated = $request->validate([
-            'item_name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
-            'quantity' => ['required', 'numeric', 'min:0'],
-            'max_capacity' => ['required', 'numeric', 'min:0.01'],
-            'reorder_level' => ['required', 'numeric', 'min:0'],
-            'unit' => ['required', 'string', 'max:50'],
+            'item_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'category' => [
+                'required',
+                'in:Detergent,Laundry Powder,Fabric Conditioner,Bleach,Stain Remover,Laundry Soap,Laundry Supply,Other',
+            ],
+
+            'quantity' => [
+                'required',
+                'integer',
+                'min:0',
+                'lte:max_capacity',
+            ],
+
+            'max_capacity' => [
+                'required',
+                'integer',
+                'min:10',
+                'max:200',
+            ],
+
+            'reorder_level' => [
+                'required',
+                'integer',
+                'min:10',
+                'max:200',
+                'lt:max_capacity',
+            ],
+
+            'unit' => [
+                'required',
+                'in:Piece,Kilogram (kg),Liter (L),Bottle,Pack,Box',
+            ],
         ]);
 
         InventoryItem::create($validated);
 
         return redirect()
             ->route('admin.inventory.index')
-            ->with('success', 'Inventory item added successfully.');
+            ->with(
+                'success',
+                'Inventory item added successfully.'
+            );
     }
 
     public function edit(InventoryItem $inventoryItem)
@@ -76,7 +108,10 @@ class InventoryController extends Controller
             abort(403);
         }
 
-        return view('admin.inventory.edit', compact('inventoryItem'));
+        return view(
+            'admin.inventory.edit',
+            compact('inventoryItem')
+        );
     }
 
     public function update(
@@ -88,19 +123,53 @@ class InventoryController extends Controller
         }
 
         $validated = $request->validate([
-            'item_name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
-            'quantity' => ['required', 'numeric', 'min:0'],
-            'max_capacity' => ['required', 'numeric', 'min:0.01'],
-            'reorder_level' => ['required', 'numeric', 'min:0'],
-            'unit' => ['required', 'string', 'max:50'],
+            'item_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'category' => [
+                'required',
+                'in:Detergent,Laundry Powder,Fabric Conditioner,Bleach,Stain Remover,Laundry Soap,Laundry Supply,Other',
+            ],
+
+            'quantity' => [
+                'required',
+                'integer',
+                'min:0',
+                'lte:max_capacity',
+            ],
+
+            'max_capacity' => [
+                'required',
+                'integer',
+                'min:10',
+                'max:200',
+            ],
+
+            'reorder_level' => [
+                'required',
+                'integer',
+                'min:10',
+                'max:200',
+                'lt:max_capacity',
+            ],
+
+            'unit' => [
+                'required',
+                'in:Piece,Kilogram (kg),Liter (L),Bottle,Pack,Box',
+            ],
         ]);
 
         $inventoryItem->update($validated);
 
         return redirect()
             ->route('admin.inventory.index')
-            ->with('success', 'Inventory item updated successfully.');
+            ->with(
+                'success',
+                'Inventory item updated successfully.'
+            );
     }
 
     public function destroy(InventoryItem $inventoryItem)
@@ -113,9 +182,12 @@ class InventoryController extends Controller
 
         return redirect()
             ->route('admin.inventory.index')
-            ->with('success', 'Inventory item removed successfully.');
+            ->with(
+                'success',
+                'Inventory item removed successfully.'
+            );
     }
-    
+
     public function monitor()
     {
         if (!in_array(auth()->user()->role, ['admin', 'staff'])) {
@@ -126,6 +198,19 @@ class InventoryController extends Controller
 
         return view(
             'admin.inventory.monitor',
+            compact('items')
+        );
+    }
+    public function view()
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'staff'])) {
+            abort(403);
+        }
+
+        $items = InventoryItem::orderBy('item_name')->get();
+
+        return view(
+            'admin.inventory.view',
             compact('items')
         );
     }

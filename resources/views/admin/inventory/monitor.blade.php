@@ -147,17 +147,17 @@
 
                     $percentage = min($percentage, 100);
 
-                    if ($item->quantity <= $item->reorder_level) {
-
-                        $status = 'Low';
-                        $statusClass = 'bg-red-100 text-red-700';
-                        $barClass = 'bg-red-500';
-
-                    } elseif ($item->quantity >= $item->max_capacity) {
+                    if ($item->quantity >= $item->max_capacity) {
 
                         $status = 'Full';
                         $statusClass = 'bg-green-100 text-green-700';
                         $barClass = 'bg-green-500';
+
+                    } elseif ($item->quantity <= $item->reorder_level) {
+
+                        $status = 'Low';
+                        $statusClass = 'bg-red-100 text-red-700';
+                        $barClass = 'bg-red-500';
 
                     } else {
 

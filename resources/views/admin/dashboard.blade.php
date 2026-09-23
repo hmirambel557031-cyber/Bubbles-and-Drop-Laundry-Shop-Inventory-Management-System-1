@@ -156,7 +156,7 @@
 
                 {{-- View Inventory --}}
                 <a
-                    href="#"
+                    href="{{ route('admin.inventory.view') }}"
                     class="flex items-center gap-3 px-3 py-3
                         rounded-lg text-blue-100
                         hover:bg-white/10 transition"

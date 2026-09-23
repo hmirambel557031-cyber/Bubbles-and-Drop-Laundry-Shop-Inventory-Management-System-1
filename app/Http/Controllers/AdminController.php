@@ -20,6 +20,11 @@ class AdminController extends Controller
             '<=',
             'reorder_level'
         )
+            ->whereColumn(
+                'quantity',
+                '<',
+                'max_capacity'
+            )
             ->orderBy('quantity')
             ->get();
 

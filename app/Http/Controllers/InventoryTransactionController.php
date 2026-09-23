@@ -12,9 +12,7 @@ class InventoryTransactionController extends Controller
 {
     public function create()
     {
-        $user = auth()->user();
-
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array(auth()->user()->role, ['admin', 'staff'])) {
             abort(403);
         }
 
@@ -28,9 +26,7 @@ class InventoryTransactionController extends Controller
 
     public function storeStockIn(Request $request)
     {
-        $user = auth()->user();
-
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array(auth()->user()->role, ['admin', 'staff'])) {
             abort(403);
         }
 
@@ -39,15 +35,18 @@ class InventoryTransactionController extends Controller
                 'required',
                 'exists:inventory_items,id',
             ],
+
             'quantity' => [
                 'required',
-                'numeric',
-                'min:0.01',
+                'integer',
+                'min:1',
             ],
+
             'date' => [
                 'required',
                 'date',
             ],
+
             'supplier' => [
                 'required',
                 'string',
@@ -55,7 +54,7 @@ class InventoryTransactionController extends Controller
             ],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $result = DB::transaction(function () use ($validated) {
 
             $item = InventoryItem::where(
                 'id',
@@ -64,34 +63,62 @@ class InventoryTransactionController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $item->increment(
-                'quantity',
-                $validated['quantity']
-            );
+            $quantity = (int) $validated['quantity'];
 
+            $newQuantity = $item->quantity + $quantity;
+
+            // Do not allow stock to exceed maximum capacity.
+            if ($newQuantity > $item->max_capacity) {
+                return [
+                    'success' => false,
+                    'message' =>
+                        'Stock-In cannot be completed. ' .
+                        'Maximum capacity is ' .
+                        $item->max_capacity . ' ' .
+                        $item->unit .
+                        ', while the resulting quantity would be ' .
+                        $newQuantity . ' ' .
+                        $item->unit . '.',
+                ];
+            }
+
+            // Update inventory quantity.
+            $item->increment('quantity', $quantity);
+
+            // Record transaction.
             InventoryTransaction::create([
                 'inventory_item_id' => $item->id,
                 'type' => 'stock-in',
-                'quantity' => $validated['quantity'],
+                'quantity' => $quantity,
                 'date' => $validated['date'],
                 'supplier' => $validated['supplier'],
                 'reason' => null,
             ]);
+
+            return [
+                'success' => true,
+                'message' => 'Stock-In recorded successfully.',
+            ];
         });
 
+        // If capacity was exceeded, stay on the form.
+        if (!$result['success']) {
+            return redirect()
+                ->route('admin.inventory.stock-in')
+                ->withInput()
+                ->with('error', $result['message']);
+        }
+
+        // Only successful transactions get a success message.
         return redirect()
             ->route('admin.inventory.stock-in')
-            ->with(
-                'success',
-                'Stock-In recorded successfully.'
-            );
+            ->with('success', $result['message']);
     }
+
 
     public function createStockOut()
     {
-        $user = auth()->user();
-
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array(auth()->user()->role, ['admin', 'staff'])) {
             abort(403);
         }
 
@@ -103,11 +130,10 @@ class InventoryTransactionController extends Controller
         );
     }
 
+
     public function storeStockOut(Request $request)
     {
-        $user = auth()->user();
-
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array(auth()->user()->role, ['admin', 'staff'])) {
             abort(403);
         }
 
@@ -116,15 +142,18 @@ class InventoryTransactionController extends Controller
                 'required',
                 'exists:inventory_items,id',
             ],
+
             'quantity' => [
                 'required',
-                'numeric',
-                'min:0.01',
+                'integer',
+                'min:1',
             ],
+
             'date' => [
                 'required',
                 'date',
             ],
+
             'reason' => [
                 'required',
                 Rule::in([
@@ -143,14 +172,16 @@ class InventoryTransactionController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $quantity = (float) $validated['quantity'];
+            $quantity = (int) $validated['quantity'];
 
-            // Prevent stock from going below zero.
+            // Prevent stock from becoming negative.
             if ($quantity > $item->quantity) {
                 return [
                     'success' => false,
-                    'message' => 'Insufficient stock. Available quantity: '
-                        . $item->quantity . ' ' . $item->unit . '.',
+                    'message' =>
+                        'Insufficient stock. Available quantity: ' .
+                        $item->quantity . ' ' .
+                        $item->unit . '.',
                 ];
             }
 
@@ -172,7 +203,8 @@ class InventoryTransactionController extends Controller
         });
 
         if (!$result['success']) {
-            return back()
+            return redirect()
+                ->route('admin.inventory.stock-out')
                 ->withInput()
                 ->with('error', $result['message']);
         }

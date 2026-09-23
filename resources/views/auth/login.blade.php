@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sign In</title>
+    <title>Management Sign In</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -82,8 +82,8 @@
             <div class="w-full max-w-sm">
 
                 <div class="mb-8">
-                    <h2 class="text-4xl font-extrabold tracking-tight text-[#0d2a7a]">Admin Sign In</h2>
-                    <p class="mt-1 text-lg font-medium text-[#2f6fe0]">Admin Portal</p>
+                    <h2 class="text-4xl font-extrabold tracking-tight text-[#0d2a7a]">Management Sign In</h2>
+                    <p class="mt-1 text-lg font-medium text-[#2f6fe0]">Management Portal</p>
                 </div>
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />

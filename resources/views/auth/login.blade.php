@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sign In</title>
+    <title>Management Sign In</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -82,8 +82,8 @@
             <div class="w-full max-w-sm">
 
                 <div class="mb-8">
-                    <h2 class="text-4xl font-extrabold tracking-tight text-[#0d2a7a]">Admin Sign In</h2>
-                    <p class="mt-1 text-lg font-medium text-[#2f6fe0]">Admin Portal</p>
+                    <h2 class="text-4xl font-extrabold tracking-tight text-[#0d2a7a]">Management Sign In</h2>
+                    <p class="mt-1 text-lg font-medium text-[#2f6fe0]">Management Portal</p>
                 </div>
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -180,19 +180,59 @@
                 <form method="POST" action="{{ route('login') }}" class="space-y-5">
                     @csrf
                     <input type="hidden" name="login_role" value="{{ $loginRole ?? 'admin' }}">
+                <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+                    <div>
+                        <label for="email" class="mb-2 block text-xs font-bold uppercase tracking-wide text-[#1e4fc4]">Username</label>
+                        <input id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            autofocus
+                            autocomplete="username"
+                            placeholder="Enter your username"
+                            class="w-full rounded-full border-0 bg-white px-5 py-3.5 text-base text-slate-800 placeholder:text-slate-400 shadow-sm outline-none ring-1 ring-transparent focus:ring-2 focus:ring-[#2f6fe0]">
+                        @error('email')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                       <label for="email"
+                            class="mb-2 block text-xs font-bold uppercase tracking-wide text-[#1e4fc4]">
+                            Email Address
+                        </label>
+                        <input id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            autofocus
+                            autocomplete="username"
+                            placeholder="Enter your email address"
+                            class="w-full rounded-full border-0 bg-white px-5 py-3.5 text-base text-slate-800 placeholder:text-slate-400 shadow-sm outline-none ring-1 ring-transparent focus:ring-2 focus:ring-[#2f6fe0]">
+                        @error('email')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
+                    <div>
+                        <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-wide text-[#1e4fc4]">Password</label>
+                        <input id="password"
                     <div>
                         <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-wide text-[#1e4fc4]">Password</label>
                         <input id="password"
                             type="password"
                             name="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="Enter your password"
+                            class="w-full rounded-full border-0 bg-white px-5 py-3.5 text-base text-slate-800 placeholder:text-slate-400 shadow-sm outline-none ring-1 ring-transparent focus:ring-2 focus:ring-[#2f6fe0]">
+                        @error('password')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                             required
                             autocomplete="current-password"
                             placeholder="Enter your password"
@@ -214,7 +254,17 @@
     </div>
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
+                    <button type="submit"
+                        class="mt-2 w-full rounded-full bg-gradient-to-r from-[#0d3fa6] to-[#1a6ee0] px-5 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-700/30 transition hover:brightness-110">
+                        Sign In
+                    </button>
+
+                    <p class="pt-1 text-center text-sm text-[#3a72d9]">Use credentials provided by your administrator</p>
+                </form>
+            </div>
+        </section>
+    </div>
+</body>
+
 </html>
